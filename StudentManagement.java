@@ -1,333 +1,255 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Scanner;
+package studentmanagement;
 
-public class StudentManagement {
-public static void saveToFile(ArrayList<Student> students) {
+import java.io.*;
+import java.util.*;
 
-    try {
-        BufferedWriter writer =
-                new BufferedWriter(new FileWriter("students.txt"));
+public class Main {
 
-        for (Student s : students) {
-            writer.write(s.id + "," + s.name + "," +
-                    s.department + "," + s.age);
-            writer.newLine();
-        }
+    static ArrayList<Student> students = new ArrayList<>();
+    static Scanner sc = new Scanner(System.in);
+    static final String FILE_NAME = "students.txt";
 
-        writer.close();
-
-    } catch (Exception e) {
-        System.out.println("Error Saving File!");
-    }
-}
-
-public static void loadFromFile(ArrayList<Student> students) {
-
-    try {
-
-        BufferedReader reader =
-                new BufferedReader(new FileReader("students.txt"));
-
-        String line;
-
-        while ((line = reader.readLine()) != null) {
-
-            String[] data = line.split(",");
-
-            students.add(
-                    new Student(
-                            Integer.parseInt(data[0]),
-                            data[1],
-                            data[2],
-                            Integer.parseInt(data[3])));
-        }
-
-        reader.close();
-
-    } catch (Exception e) {
-        System.out.println("No Previous Data Found.");
-    }
-}
     public static void main(String[] args) {
 
-        ArrayList<Student> students = new ArrayList<>();
-        loadFromFile(students);
-        Scanner sc = new Scanner(System.in);
+        loadFromFile();
 
         while (true) {
 
-            System.out.println("\n===== Student Management System =====");
+            System.out.println("\n===== STUDENT MANAGEMENT SYSTEM =====");
             System.out.println("1. Add Student");
             System.out.println("2. View Students");
             System.out.println("3. Search Student");
-            System.out.println("4. Delete Student");
-            System.out.println("5. Update Student");
-            System.out.println("6. Total Students");
-            System.out.println("7.Sort Students By ID");
+            System.out.println("4. Update Student");
+            System.out.println("5. Delete Student");
+            System.out.println("6. Total Students Count");
+            System.out.println("7. Sort Students By ID");
             System.out.println("8. Exit");
 
-            int choice;
+            System.out.print("Enter Choice: ");
 
             try {
-                System.out.print("Enter Choice: ");
-                choice = sc.nextInt();
+
+                int choice = sc.nextInt();
+
+                switch (choice) {
+
+                    case 1:
+                        addStudent();
+                        break;
+
+                    case 2:
+                        viewStudents();
+                        break;
+
+                    case 3:
+                        searchStudent();
+                        break;
+
+                    case 4:
+                        updateStudent();
+                        break;
+
+                    case 5:
+                        deleteStudent();
+                        break;
+
+                    case 6:
+                        System.out.println("Total Students = " + students.size());
+                        break;
+
+                    case 7:
+                        sortStudents();
+                        break;
+
+                    case 8:
+                        saveToFile();
+                        System.out.println("Thank You");
+                        System.exit(0);
+
+                    default:
+                        System.out.println("Invalid Choice");
+                }
+
             } catch (Exception e) {
-                System.out.println("Invalid Input! Please enter a number.");
+
+                System.out.println("Invalid Input");
                 sc.nextLine();
-                continue;
-            }
-
-            switch (choice) {
-
-                case 1:
-
-                    int id;
-
-                    try {
-                        System.out.print("Enter ID: ");
-                        id = sc.nextInt();
-                    } catch (Exception e) {
-                        System.out.println("Invalid ID! Enter numbers only.");
-                        sc.nextLine();
-                        break;
-                    }
-
-                    boolean idExists = false;
-
-                    for (Student s : students) {
-                        if (s.id == id) {
-                            idExists = true;
-                            break;
-                        }
-                    }
-
-                    if (idExists) {
-                        System.out.println("Student ID already exists!");
-                        break;
-                    }
-
-                    sc.nextLine();
-
-                    System.out.print("Enter Name: ");
-                    String name = sc.nextLine();
-
-                    System.out.print("Enter Department: ");
-                    String dept = sc.nextLine();
-
-                    int age;
-
-                    try {
-                        System.out.print("Enter Age: ");
-                        age = sc.nextInt();
-                    } catch (Exception e) {
-                        System.out.println("Invalid Age! Enter numbers only.");
-                        sc.nextLine();
-                        break;
-                    }
-
-                    students.add(new Student(id, name, dept, age));
-                    saveToFile(students);
-
-                    System.out.println("Student Added Successfully!");
-                    break;
-
-                case 2:
-
-                    if (students.isEmpty()) {
-                        System.out.println("No Students Found!");
-                    } else {
-
-                        for (Student s : students) {
-
-                            System.out.println(
-                                    "ID: " + s.id +
-                                    " Name: " + s.name +
-                                    " Department: " + s.department +
-                                    " Age: " + s.age);
-                        }
-                    }
-                    break;
-
-                case 3:
-
-                    System.out.print("Enter Student ID to Search: ");
-
-                    int searchId;
-
-                    try {
-                        searchId = sc.nextInt();
-                    } catch (Exception e) {
-                        System.out.println("Invalid ID!");
-                        sc.nextLine();
-                        break;
-                    }
-
-                    boolean found = false;
-
-                    for (Student s : students) {
-
-                        if (s.id == searchId) {
-
-                            System.out.println("Student Found!");
-                            System.out.println("ID: " + s.id);
-                            System.out.println("Name: " + s.name);
-                            System.out.println("Department: " + s.department);
-                            System.out.println("Age: " + s.age);
-
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (!found) {
-                        System.out.println("Student Not Found!");
-                    }
-
-                    break;
-
-                case 4:
-
-                    System.out.print("Enter Student ID to Delete: ");
-
-                    int deleteId;
-
-                    try {
-                        deleteId = sc.nextInt();
-                    } catch (Exception e) {
-                        System.out.println("Invalid ID!");
-                        sc.nextLine();
-                        break;
-                    }
-
-                    boolean deleted = false;
-
-                    for (int i = 0; i < students.size(); i++) {
-
-                        if (students.get(i).id == deleteId) {
-
-                            students.remove(i);
-                            saveToFile(students);
-
-                            System.out.println("Student Deleted Successfully!");
-
-                            deleted = true;
-                            break;
-                        }
-                    }
-
-                    if (!deleted) {
-                        System.out.println("Student Not Found!");
-                    }
-
-                    break;
-
-                case 5:
-
-                    System.out.print("Enter Student ID to Update: ");
-
-                    int updateId;
-
-                    try {
-                        updateId = sc.nextInt();
-                    } catch (Exception e) {
-                        System.out.println("Invalid ID!");
-                        sc.nextLine();
-                        break;
-                    }
-
-                    sc.nextLine();
-
-                    boolean updated = false;
-
-                    for (Student s : students) {
-
-                        if (s.id == updateId) {
-
-                            System.out.print("Enter New Name: ");
-                            s.name = sc.nextLine();
-
-                            System.out.print("Enter New Department: ");
-                            s.department = sc.nextLine();
-
-                            try {
-                                System.out.print("Enter New Age: ");
-                                s.age = sc.nextInt();
-                            } catch (Exception e) {
-                                System.out.println("Invalid Age!");
-                                sc.nextLine();
-                                break;
-                            }
-
-                            System.out.println("Student Updated Successfully!");
-                            saveToFile(students);
-
-                            updated = true;
-                            break;
-                        }
-                    }
-
-                    if (!updated) {
-                        System.out.println("Student Not Found!");
-                    }
-
-                    break;
-
-                case 6:
-
-                    System.out.println("Total Students: " + students.size());
-                    break;
-                case 7:
-                    
-
-    if (students.isEmpty()) {
-
-        System.out.println("No Students Found!");
-        break;
-    }
-
-    for (int i = 0; i < students.size() - 1; i++) {
-
-        for (int j = i + 1; j < students.size(); j++) {
-
-            if (students.get(i).id > students.get(j).id) {
-
-                Student temp = students.get(i);
-                students.set(i, students.get(j));
-                students.set(j, temp);
             }
         }
     }
 
-    System.out.println("Students Sorted By ID Successfully!");
+    static void addStudent() {
 
-    for (Student s : students) {
+        try {
 
-        System.out.println(
-                "ID: " + s.id +
-                " Name: " + s.name +
-                " Department: " + s.department +
-                " Age: " + s.age);
+            System.out.print("Enter ID: ");
+            int id = sc.nextInt();
+
+            for (Student s : students) {
+
+                if (s.id == id) {
+
+                    System.out.println("Duplicate ID Not Allowed");
+                    return;
+                }
+            }
+
+            System.out.print("Enter Name: ");
+            String name = sc.next();
+
+            System.out.print("Enter Marks: ");
+            int marks = sc.nextInt();
+
+            students.add(new Student(id, name, marks));
+
+            saveToFile();
+
+            System.out.println("Student Added Successfully");
+
+        } catch (Exception e) {
+
+            System.out.println("Error Occurred");
+        }
     }
 
-    break;
+    static void viewStudents() {
 
+        if (students.isEmpty()) {
 
+            System.out.println("No Students Found");
+            return;
+        }
 
+        for (Student s : students) {
 
+            System.out.println(
+                    "ID: " + s.id +
+                            " Name: " + s.name +
+                            " Marks: " + s.marks
+            );
+        }
+    }
 
-                case 8:
+    static void searchStudent() {
 
-                    System.out.println("Thank You!");
-                    System.exit(0);
+        System.out.print("Enter ID: ");
+        int id = sc.nextInt();
 
-                default:
+        for (Student s : students) {
 
-                    System.out.println("Invalid Choice");
+            if (s.id == id) {
+
+                System.out.println(
+                        "ID: " + s.id +
+                                " Name: " + s.name +
+                                " Marks: " + s.marks
+                );
+
+                return;
             }
+        }
+
+        System.out.println("Student Not Found");
+    }
+
+    static void updateStudent() {
+
+        System.out.print("Enter ID: ");
+        int id = sc.nextInt();
+
+        for (Student s : students) {
+
+            if (s.id == id) {
+
+                System.out.print("Enter New Name: ");
+                s.name = sc.next();
+
+                System.out.print("Enter New Marks: ");
+                s.marks = sc.nextInt();
+
+                saveToFile();
+
+                System.out.println("Updated Successfully");
+                return;
+            }
+        }
+
+        System.out.println("Student Not Found");
+    }
+
+    static void deleteStudent() {
+
+        System.out.print("Enter ID: ");
+        int id = sc.nextInt();
+
+        Iterator<Student> iterator = students.iterator();
+
+        while (iterator.hasNext()) {
+
+            Student s = iterator.next();
+
+            if (s.id == id) {
+
+                iterator.remove();
+
+                saveToFile();
+
+                System.out.println("Deleted Successfully");
+                return;
+            }
+        }
+
+        System.out.println("Student Not Found");
+    }
+
+    static void sortStudents() {
+
+        students.sort(Comparator.comparingInt(s -> s.id));
+
+        System.out.println("Sorted By ID");
+
+        viewStudents();
+    }
+
+    static void saveToFile() {
+
+        try (BufferedWriter bw =
+                     new BufferedWriter(new FileWriter(FILE_NAME))) {
+
+            for (Student s : students) {
+
+                bw.write(s.toString());
+                bw.newLine();
+            }
+
+        } catch (IOException e) {
+
+            System.out.println("File Save Error");
+        }
+    }
+
+    static void loadFromFile() {
+
+        try (BufferedReader br =
+                     new BufferedReader(new FileReader(FILE_NAME))) {
+
+            String line;
+
+            while ((line = br.readLine()) != null) {
+
+                String[] data = line.split(",");
+
+                students.add(
+                        new Student(
+                                Integer.parseInt(data[0]),
+                                data[1],
+                                Integer.parseInt(data[2])
+                        )
+                );
+            }
+
+        } catch (Exception e) {
+            // First run - file may not exist
         }
     }
 }
