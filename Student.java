@@ -1,12 +1,19 @@
-public class Student{
+package studentmanagement;
+
+public class Student {
+
     int id;
     String name;
-    String department;
-    int age;
-    Student(int id,String name,String department,int age){
+    int marks;
+
+    public Student(int id, String name, int marks) {
         this.id = id;
         this.name = name;
-        this.department = department;
-        this.age = age;
+        this.marks = marks;
+    }
+
+    @Override
+    public String toString() {
+        return id + "," + name + "," + marks;
     }
 }
